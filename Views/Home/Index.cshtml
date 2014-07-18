@@ -107,25 +107,28 @@
         }
 
         function EmpEntry() {
-            var name = document.getElementById("Name").value;
+            var name = document.getElementById("Name").value.trim();
             var id;
             var defaultnum = document.getElementById("DropDown").value;
-            $.ajax({
-                url: "/Home/CreateEmployee",
-                type: "POST",
-                data: { name: name, departmentid: defaultnum },
-                datatype: "json",
-                success: function(data) {
-                    id = data;
-                    ChkEntry(id);
-                    $("#dialog").dialog('close');
-                    $("#Name").val("");
-                },
-                error: function(data) {
-                    alert("fail");
-                }
-            });
-
+            if (name == "" || name == "Please enter the name") {
+                $("#Name").val("Please enter the name");
+            } else {
+                $.ajax({
+                    url: "/Home/CreateEmployee",
+                    type: "POST",
+                    data: { name: name, departmentid: defaultnum },
+                    datatype: "json",
+                    success: function(data) {
+                        id = data;
+                        ChkEntry(id);
+                        $("#dialog").dialog('close');
+                        $("#Name").val("");
+                    },
+                    error: function(data) {
+                        alert("fail");
+                    }
+                });
+            }
         }
 
         function FetchAllEmp() {
@@ -175,22 +178,26 @@
         function EmpEdit() {
             var id = $("#EditId").val();
             var deptid = document.getElementById("DropDown1").value;
-            var name = document.getElementById("Name1").value;
-            $.ajax({
-                url: "/Home/EditEmp",
-                type: "POST",
-                data: { id: id, name: name, departmentid: deptid },
-                datatype: "json",
-                success: function(data) {
-                    $("#tblEmp").empty();
-                    $("#tblEmp").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Department" + "</td>" + "<td>" + "Action" + "</td>" + "</tr>");
-                    FetchAllEmp();
-                    $("#dialog1").dialog('close');
-                },
-                error: function(data) {
-                    alert("fail");
-                }
-            });
+            var name = document.getElementById("Name1").value.trim();
+            if (name == "" || name == "Please enter the name") {
+                $("#Name1").val("Please enter the name");
+            } else {
+                $.ajax({
+                    url: "/Home/EditEmp",
+                    type: "POST",
+                    data: { id: id, name: name, departmentid: deptid },
+                    datatype: "json",
+                    success: function(data) {
+                        $("#tblEmp").empty();
+                        $("#tblEmp").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Department" + "</td>" + "<td>" + "Action" + "</td>" + "</tr>");
+                        FetchAllEmp();
+                        $("#dialog1").dialog('close');
+                    },
+                    error: function(data) {
+                        alert("fail");
+                    }
+                });
+            }
         }
 
     </script>
@@ -260,46 +267,53 @@
         };
 
         function DeptEntry() {
-            var name = document.getElementById("DeptName").value;
+            var name = document.getElementById("DeptName").value.trim();
             var id;
-            $.ajax({
-                url: "/Home/CreateDepartment",
-                type: "POST",
-                data: { name: name },
-                datatype: "json",
-                success: function(data) {
-                    id = data;
-                    ChkDept(id);
-
-                    $("#dialog2").dialog("close");
-                    $("#Name").val("");
-                },
-                error: function(data) {
-                    alert("fail");
-                }
-            });
+            if (name == "" || name == "Please enter the name") {
+                $("#DeptName").val("Please enter the name");
+            } else {
+                $.ajax({
+                    url: "/Home/CreateDepartment",
+                    type: "POST",
+                    data: { name: name },
+                    datatype: "json",
+                    success: function(data) {
+                        id = data;
+                        ChkDept(id);
+                        $("#dialog2").dialog("close");
+                        $("#DeptName").val("");
+                    },
+                    error: function(data) {
+                        alert("fail");
+                    }
+                });
+            }
         }
 
 
         function DeptEdit() {
             var id = $("#EditDeptId").val();
-            var name = document.getElementById("DeptName1").value;
-            $.ajax({
-                url: "/Home/EditDept",
-                type: "POST",
-                data: { id: id, name: name },
-                datatype: "json",
-                success: function(data) {
-                    $("#tblDept").empty();
-                    $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
-                    displayDeptAll();
-                    $("#dialog3").dialog('close');
+            var name = document.getElementById("DeptName1").value.trim();
+            if (name == "" || name == "Please enter the name") {
+                $("#DeptName1").val("Please enter the name");
+            } else {
+                $.ajax({
+                    url: "/Home/EditDept",
+                    type: "POST",
+                    data: { id: id, name: name },
+                    datatype: "json",
+                    success: function(data) {
+                        $("#tblDept").empty();
+                        $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
+                        displayDeptAll();
+                        $("#dialog3").dialog('close');
 
-                },
-                error: function(data) {
-                    alert("fail");
-                }
-            });
+                    },
+                    error: function(data) {
+                        alert("fail");
+                    }
+                });
+            }
         }
 
 
@@ -316,6 +330,7 @@
                     $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
                     displayDeptAll();
                     $("#dialog2").dialog("close");
+
                 },
                 error: function(data) {
                     alert("fail");
@@ -363,14 +378,11 @@
                 width: 600,
                 autoOpen: false,
                 show: {
-                    effect: "blind",
+                    effect: "fade",
                     duration: 1000
 
                 },
-                hide: {
-                    effect: "explode",
-                    duration: 1000
-                }
+               
             });
 
 
@@ -380,14 +392,11 @@
                 autoOpen: false,
                 resizable: false,
                 show: {
-                    effect: "blind",
+                    effect: "fade",
                     duration: 1000
 
                 },
-                hide: {
-                    effect: "explode",
-                    duration: 1000
-                },
+              
             });
 
             $("#dialog3").dialog({
@@ -395,14 +404,11 @@
                 width: 600,
                 autoOpen: false,
                 show: {
-                    effect: "blind",
+                    effect: "fade",
                     duration: 1000
 
                 },
-                hide: {
-                    effect: "explode",
-                    duration: 1000
-                }
+               
             });
 
             $("#dialog2").dialog({
@@ -411,15 +417,10 @@
                 autoOpen: false,
                 resizable: false,
                 show: {
-                    effect: "blind",
+                    effect: "fade",
                     duration: 1000
 
                 },
-                hide: {
-                    effect: "explode",
-                    duration: 1000
-                },
-
 
             });
 
@@ -443,13 +444,13 @@
                         } else {
                             $("#chkk").empty();
                             $("#chkk").append("<p><b>Please create a new department first to assign it to an employ!</b></p>");
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 $("#dialog").dialog("close");
 
                                 var url = '@Url.Action("Index", "Home")';
                                 window.location.href = url;
                             }, 4000);
-                           
+
                         }
                     },
                     error: function(data) {

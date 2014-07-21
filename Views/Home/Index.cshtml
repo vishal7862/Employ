@@ -23,6 +23,7 @@
                 <td>Actions</td>
             </tr>
         </table>
+       
         <table class="table" border="1" id="tblDept" style="display: none">
             <tr>
                 <td>Id</td>
@@ -70,6 +71,23 @@
     </div>
 </div>
 
+<!--Dialog for delete emp confirmation-->
+<div id="dialogDelConEmp" title="Confirmation" style="text-align: left;display: none;">
+
+    <div>
+        <p><b>Are you sure you want to delete </b><br /></p>
+        <p><span><b id="PempName">aslcnaslnca?</b></span></p>
+    </div>
+    <br />
+
+    <div id="EditDelId" style=""></div>
+    <br />
+    <div>
+        <input type="button" value="Delete" class="btn btn-default" id="btn_save" onclick="DelConfirmEmp()" />
+        <input type="button" value="Cancel" class="btn btn-default" id="btn_cancel" onclick="Close1()" />
+    </div>
+
+</div>
 
 <!--Dialogs of Departments-->
 <!--Dialog For Create -->
@@ -94,11 +112,34 @@
     </div>
 </div>
 
+<!--Dialog for delete dept confirmation-->
+<div id="dialogDelConDept" title="Confirmation" style="text-align: left;display: none;">
+    <div>
+        <p><b>Are you sure you want to delete department </b><br /></p>
+        <p><span><b id="PdeptName">aslcnaslnca?</b></span></p>
+    </div>
+    <br />
+
+    <div id="EditDelDeptId" style=""></div>
+    <br />
+    <div>
+        <input type="button" value="Delete" class="btn btn-default" id="btn_save" onclick="DeleteDept()" />
+        <input type="button" value="Cancel" class="btn btn-default" id="btn_cancel1" onclick="Close()" />
+    </div>
+
+</div>
 
 @section scripts
 {
-    <!--Employees Scripts-->
+    <!--Functions for Employees-->
     <script>
+        function Close() {
+            $("#dialogDelConDept").dialog("close");
+        }
+
+        function Close1() {
+            $("#dialogDelConEmp").dialog("close");
+        }
 
         function ChkEntry(id) {
 
@@ -200,55 +241,45 @@
             }
         }
 
+        function DelConfirmEmp() {
+            var id = $("#EditDelId").val();
+            $.ajax({
+                url: "/Home/DeleteEmp",
+                type: "POST",
+                data: { id: id },
+                datatype: "json",
+                success: function(data) {
+                    $("#dialogDelConEmp").dialog("close");
+                    $("#tblEmp").empty();
+                    $("#tblEmp").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Department" + "</td>" + "<td>" + "Action" + "</td>" + "</tr>");
+                    FetchAllEmp();
+                },
+                error: function(data) {
+                    alert("fail");
+                }
+            });
+        }
+
+
     </script>
-    <!--Testing-->
-    <!--
-        <script>
 
-             var oEmployeesTable = $('#tblEmp').dataTable({
-                 "bJQueryUI": true,
-                 "bServerSide": true,
-                 "sAjaxSource": "/Home/GetAllEmployee"
-             });
-
-
-             $("#btn_save").click(function(e) {
-                 var name = document.getElementById("Name").value;
-                 var defaultnum = document.getElementById("DropDown").value;
-                 e.preventDefault();
-                 e.stopPropagation();
-                 $.ajax({
-                     url: "/Home/CreateEmployee",
-                     type: "POST",
-                     data: { name: name, departmentid: defaultnum },
-                     datatype: "json",
-                     success: function(data) {
-                         $("#dialog").dialog('close');
-                         oEmployeesTable.fnDraw();
-                     },
-                     error: function(data) {
-                         alert("fail");
-                     }
-                 });
-             });
-
-
-     </script>
-        -->
     <!--CompletedTesting-->
-    <!--Department Scripts-->
+    <!--Funtions for Department -->
     <script>
-        function ChkDept(id) {
+        var count = 0;
 
-            $("#tblDept").append("<tr>" + "<td>" + id + "</td>" + "<td>" + $("#DeptName").val() + "</td>" + "<td>" + "<a href='#' class='EditDept' attr3='" + id + "'>" + "Edit</a>" + "|" + "<a href='#' class='DeleteDept' attr4='" + id + "'>" + "Delete</a>" + "</td>" + "</tr>");
+        function ChkDept(id) {
+            var x = 0;
+            $("#tblDept").append("<tr>" + "<td>" + id + "</td>" + "<td>" + $("#DeptName").val() + "</td>" + "<td>" + x + "</td>" + "<td>" + "<a href='#' class='EditDept' attr3='" + id + "'>" + "Edit</a>" + "|" + "<a href='#' class='DeleteDept' attr4='" + id + "'>" + "Delete</a>" + "</td>" + "</tr>");
 
         }
 
         function displayDeptAll() {
             $("#tblDept").show();
             $("#Spinner").show();
+            debugger;
             $.ajax({
-                url: "/Home/GetAllDepartments",
+                url: "/Home/GetAllEmployeesByDepartments",
                 type: "Get",
                 datatype: "json",
                 success: function(data) {
@@ -256,8 +287,9 @@
                     $("#Spinner").hide();
                     $.each(jsonObj, function(i, item) {
 
-                        $("#tblDept").append("<tr>" + "<td>" + item.Id + "</td>" + "<td>" + item.Name + "</td>" + "<td>" + "<a href='#' class='EditDept' attr3='" + item.Id + "'>" + "Edit</a>" + "|" + "<a href='#' class='DeleteDept' attr4='" + item.Id + "'>" + "Delete</a>" + "</td>" + "</tr>");
-
+                        //x =new Array(GetEmpByDept(item.Id));
+                        $("#tblDept").append("<tr>" + "<td>" +item.Id + "</td>" + "<td>" + item.Name + "</td>" + "<td>" + item.Total + "</td>" + "<td>" + "<a href='#' class='EditDept' attr3='" + item.Id + "'>" + "Edit</a>" + "|" + "<a href='#' class='DeleteDept' attr4='" + item.Id + "'>" + "Delete</a>" + "</td>" + "</tr>");
+                        ;
                     });
                 },
                 error: function(data) {
@@ -265,6 +297,24 @@
                 }
             });
         };
+
+        function GetEmpByDept(id) {
+            var id1 = id;
+            $.ajax({
+                url: "/Home/GetNumberOfEmpByDeptId",
+                type: "GET",
+                data: { id: id1 },
+                success: function(data) {
+                    count = data;
+                },
+                error: function(data) {
+                    alert("fail");
+                }
+            });
+
+            return count;
+        }
+
 
         function DeptEntry() {
             var name = document.getElementById("DeptName").value.trim();
@@ -304,7 +354,7 @@
                     datatype: "json",
                     success: function(data) {
                         $("#tblDept").empty();
-                        $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
+                        $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "No of employees" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
                         displayDeptAll();
                         $("#dialog3").dialog('close');
 
@@ -317,8 +367,8 @@
         }
 
 
-        function DeleteDept(obj) {
-            var id = obj.attr('attr4');
+        function DeleteDept() {
+            var id = $("#EditDelDeptId").val();
 
             $.ajax({
                 url: "/Home/DeleteDept",
@@ -327,9 +377,9 @@
                 datatype: "json",
                 success: function(data) {
                     $("#tblDept").empty();
-                    $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
+                    $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "No of employees" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
                     displayDeptAll();
-                    $("#dialog2").dialog("close");
+                    $("#dialogDelConDept").dialog("close");
 
                 },
                 error: function(data) {
@@ -344,23 +394,23 @@
     <!--general scripts-->
     <script>
         $(function() {
-            var x = 0;
+
             FetchAllEmp();
 
             FetchDataDropDown();
-
+            //on Employee link click event
             $("#DeptLink").click(function() {
                 $("#tblDept").empty();
-                $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
+                $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "No of employees" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
                 displayDeptAll();
                 $("#OpenDialog1").show();
                 $("#tblDept").show();
                 $("#tblEmp").hide();
                 $("#OpenDialog").hide();
-                x = 1;
+
             });
 
-
+            //on Department link click event
             $("#EmpLink").click(function() {
                 FetchDataDropDown();
                 $("#tblEmp").empty();
@@ -369,10 +419,10 @@
                 $("#OpenDialog").show();
                 $("#tblDept").hide();
                 $("#OpenDialog1").hide();
-                x = 2;
+
             });
 
-
+            // create dialog for Employee
             $("#dialog").dialog({
                 height: 300,
                 width: 600,
@@ -382,10 +432,10 @@
                     duration: 1000
 
                 },
-               
+
             });
 
-
+            //edit dialog for Employee
             $("#dialog1").dialog({
                 height: 300,
                 width: 600,
@@ -396,9 +446,10 @@
                     duration: 1000
 
                 },
-              
+
             });
 
+            // create dialog for Department
             $("#dialog3").dialog({
                 height: 300,
                 width: 600,
@@ -408,8 +459,10 @@
                     duration: 1000
 
                 },
-               
+
             });
+
+            // edit dialog for Department
 
             $("#dialog2").dialog({
                 height: 300,
@@ -424,6 +477,44 @@
 
             });
 
+            $("#dialogDelConEmp").dialog({
+                height: 300,
+                width: 600,
+                autoOpen: false,
+                resizable: false,
+                open: function(event, ui) {
+                    $(this).css('overflow', 'hidden');
+                    $("body").css('overflow', 'hidden');
+                },
+                beforeClose: function(event, ui) {
+                    $("body").css({ overflow: 'inherit' });
+                },
+                show: {
+                    effect: "fade",
+                    duration: 1000
+
+                },
+
+            });
+
+            $("#dialogDelConDept").dialog({
+                height: 300,
+                width: 600,
+                autoOpen: false,
+                resizable: false,
+                open: function(event, ui) {
+                    $(this).css('overflow', 'hidden');
+                    $("body").css('overflow', 'hidden');
+                },
+                beforeClose: function(event, ui) {
+                    $("body").css({ overflow: 'inherit' });
+                },
+                show: {
+                    effect: "fade",
+                    duration: 1000
+                },
+            });
+            // click event for opening create Dialog
             $("#OpenDialog").click(function() {
 
                 $.ajax({
@@ -460,7 +551,7 @@
 
             });
 
-
+            // click event for editing dialog
             $("#OpenDialog1").click(function() {
 
 
@@ -491,26 +582,30 @@
                 });
             });
 
+            //click event for Deleteing employee
             $(document).on('click', '.Delete', function() {
-                var id = $(this).attr("attr2");
 
+                var id = $(this).attr("attr2");
                 $.ajax({
-                    url: "/Home/DeleteEmp",
-                    type: "POST",
+                    url: "/Home/GetEmpById",
+                    type: "Get",
+                    async: true,
+                    contentType: 'application/json; charset=utf-8',
                     data: { id: id },
                     datatype: "json",
-                    success: function(data) {
-                        $("#tblEmp").empty();
-                        $("#tblEmp").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Department" + "</td>" + "<td>" + "Action" + "</td>" + "</tr>");
-                        FetchAllEmp();
+                    success: function(result) {
+                        var jsonObj = JSON.parse(result);
+                        $("#dialogDelConEmp").dialog('open');
+                        $("#PempName").text(jsonObj.Name + " from department " + jsonObj.Department.Name + " ?");
+                        $("#EditDelId").val(id);
                     },
-                    error: function(data) {
-                        alert("fail");
+                    error: function(result) {
+
+                        alert('fail');
                     }
                 });
-
             });
-
+            // click event for editing department
             $(document).on('click', '.EditDept', function() {
                 var id = $(this).attr("attr3");
 
@@ -526,6 +621,7 @@
                         $("#dialog3").dialog('open');
                         $("#DeptName1").val(jsonObj.Name);
                         $("#EditDeptId").val(id);
+
                     },
                     error: function(result) {
 
@@ -534,9 +630,28 @@
                 });
             });
 
+            // click event for deleteing department
             $(document).on('click', '.DeleteDept', function() {
+                var id = $(this).attr("attr4");
+                $.ajax({
+                    url: "/Home/GetDeptById",
+                    type: "Get",
+                    async: true,
+                    contentType: 'application/json; charset=utf-8',
+                    data: { id: id },
+                    datatype: "json",
+                    success: function(result) {
+                        var jsonObj = JSON.parse(result);
+                        $("#dialogDelConDept").dialog('open');
+                        $("#PdeptName").text(jsonObj.Name + "?");
+                        $("#EditDelDeptId").val(id);
+                    },
+                    error: function(result) {
 
-                DeleteDept($(this));
+                        alert('fail');
+                    }
+                });
+                //DeleteDept($(this));
 
             });
 

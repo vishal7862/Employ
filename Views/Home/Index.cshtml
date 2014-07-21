@@ -15,6 +15,7 @@
         <img src="~/Images/spin.gif" />
     </div>
     <div>
+        <div id="EmpTitle" style="display: none;position:relative;left:385px;color:red;">Employee Section</div>
         <table class="table" border="1" id="tblEmp" style="display: none">
             <tr>
                 <td>Id</td>
@@ -23,7 +24,7 @@
                 <td>Actions</td>
             </tr>
         </table>
-       
+        <div id="DeptTitle" style="display: none;position:relative;left:385px;color:red">Department Section</div>
         <table class="table" border="1" id="tblDept" style="display: none">
             <tr>
                 <td>Id</td>
@@ -108,7 +109,7 @@
     <div id="EditDeptId" style=""></div>
     <br />
     <div>
-        <input type="button" value="Create" class="btn btn-default" id="btn_save" onclick="DeptEdit()" />
+        <input type="button" value="Edit" class="btn btn-default" id="btn_save" onclick="DeptEdit()" />
     </div>
 </div>
 
@@ -143,7 +144,7 @@
 
         function ChkEntry(id) {
 
-            $("#tblEmp").append("<tr>" + "<td>" + id + "</td>" + "<td>" + $("#Name").val() + "</td>" + "<td>" + $("#DropDown option:selected").text() + "</td>" + "<td>" + "<a href='#' class='Edit' attr1='" + id + "'>" + "Edit</a>" + "|" + "<a href='#' class='Delete' attr2='" + id + "'>" + "Delete</a>" + "</td>" + "</tr>");
+            $("#tblEmp").append("<tr>" + "<td>" + id + "</td>" + "<td>" + $("#Name").val() + "</td>" + "<td>" + $("#DropDown option:selected").text() + "</td>" + "<td>" + "<a href='#Employees' class='Edit' attr1='" + id + "'>" + "Edit</a>" + "|" + "<a href='#Employees' class='Delete' attr2='" + id + "'>" + "Delete</a>" + "</td>" + "</tr>");
 
         }
 
@@ -159,13 +160,13 @@
                     type: "POST",
                     data: { name: name, departmentid: defaultnum },
                     datatype: "json",
-                    success: function(data) {
+                    success: function (data) {
                         id = data;
                         ChkEntry(id);
                         $("#dialog").dialog('close');
                         $("#Name").val("");
                     },
-                    error: function(data) {
+                    error: function (data) {
                         alert("fail");
                     }
                 });
@@ -173,6 +174,8 @@
         }
 
         function FetchAllEmp() {
+            $("#EmpTitle").show();
+            $("#DeptTitle").hide();
             $("#OpenDialog1").hide();
             $("#tblEmp").show();
             $("#Spinner").show();
@@ -180,16 +183,16 @@
                 url: "/Home/GetAllEmployee",
                 type: "GET",
                 datatype: "json",
-                success: function(data) {
+                success: function (data) {
                     var jsonObj = JSON.parse(data);
                     $("#Spinner").hide();
-                    $.each(jsonObj, function(i, item) {
+                    $.each(jsonObj, function (i, item) {
 
-                        $("#tblEmp").append("<tr>" + "<td>" + item.Id + "</td>" + "<td>" + item.Name + "</td>" + "<td>" + item.Department.Name + "</td>" + "<td>" + "<a href='#' class='Edit' attr1='" + item.Id + "'>" + "Edit</a>" + "|" + "<a href='#' class='Delete' attr2='" + item.Id + "'>" + "Delete</a>" + "</td>" + "</tr>");
+                        $("#tblEmp").append("<tr>" + "<td>" + item.Id + "</td>" + "<td>" + item.Name + "</td>" + "<td>" + item.Department.Name + "</td>" + "<td>" + "<a href='#Employees' class='Edit' attr1='" + item.Id + "'>" + "Edit</a>" + "|" + "<a href='#Employees' class='Delete' attr2='" + item.Id + "'>" + "Delete</a>" + "</td>" + "</tr>");
 
                     });
                 },
-                error: function(data) {
+                error: function (data) {
                     alert("fail");
                 }
             });
@@ -202,15 +205,15 @@
                 type: "GET",
 
                 datatype: "json",
-                success: function(data) {
+                success: function (data) {
                     $("#DropDown1").empty();
                     var jsonObj = JSON.parse(data);
-                    $.each(jsonObj, function(index, optiondata) {
+                    $.each(jsonObj, function (index, optiondata) {
                         $("#DropDown1").append("<option value='" + optiondata.Id + "'>" + optiondata.Name + "</option>");
                     });
 
                 },
-                error: function(data) {
+                error: function (data) {
                     alert("fail");
                 }
             });
@@ -228,13 +231,13 @@
                     type: "POST",
                     data: { id: id, name: name, departmentid: deptid },
                     datatype: "json",
-                    success: function(data) {
+                    success: function (data) {
                         $("#tblEmp").empty();
                         $("#tblEmp").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Department" + "</td>" + "<td>" + "Action" + "</td>" + "</tr>");
                         FetchAllEmp();
                         $("#dialog1").dialog('close');
                     },
-                    error: function(data) {
+                    error: function (data) {
                         alert("fail");
                     }
                 });
@@ -248,13 +251,13 @@
                 type: "POST",
                 data: { id: id },
                 datatype: "json",
-                success: function(data) {
+                success: function (data) {
                     $("#dialogDelConEmp").dialog("close");
                     $("#tblEmp").empty();
                     $("#tblEmp").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Department" + "</td>" + "<td>" + "Action" + "</td>" + "</tr>");
                     FetchAllEmp();
                 },
-                error: function(data) {
+                error: function (data) {
                     alert("fail");
                 }
             });
@@ -270,29 +273,31 @@
 
         function ChkDept(id) {
             var x = 0;
-            $("#tblDept").append("<tr>" + "<td>" + id + "</td>" + "<td>" + $("#DeptName").val() + "</td>" + "<td>" + x + "</td>" + "<td>" + "<a href='#' class='EditDept' attr3='" + id + "'>" + "Edit</a>" + "|" + "<a href='#' class='DeleteDept' attr4='" + id + "'>" + "Delete</a>" + "</td>" + "</tr>");
+            $("#tblDept").append("<tr>" + "<td>" + id + "</td>" + "<td>" + $("#DeptName").val() + "</td>" + "<td>" + x + "</td>" + "<td>" + "<a href='#Departments' class='EditDept' attr3='" + id + "'>" + "Edit</a>" + "|" + "<a href='#Departments' class='DeleteDept' attr4='" + id + "'>" + "Delete</a>" + "</td>" + "</tr>");
 
         }
 
         function displayDeptAll() {
+            $("#EmpTitle").hide();
+            $("#DeptTitle").show();
+            $("#OpenDialog").hide();
             $("#tblDept").show();
             $("#Spinner").show();
-            debugger;
+
             $.ajax({
                 url: "/Home/GetAllEmployeesByDepartments",
                 type: "Get",
                 datatype: "json",
-                success: function(data) {
+                success: function (data) {
                     var jsonObj = JSON.parse(data);
                     $("#Spinner").hide();
-                    $.each(jsonObj, function(i, item) {
+                    $.each(jsonObj, function (i, item) {
 
                         //x =new Array(GetEmpByDept(item.Id));
-                        $("#tblDept").append("<tr>" + "<td>" +item.Id + "</td>" + "<td>" + item.Name + "</td>" + "<td>" + item.Total + "</td>" + "<td>" + "<a href='#' class='EditDept' attr3='" + item.Id + "'>" + "Edit</a>" + "|" + "<a href='#' class='DeleteDept' attr4='" + item.Id + "'>" + "Delete</a>" + "</td>" + "</tr>");
-                        ;
+                        $("#tblDept").append("<tr>" + "<td>" + item.Id + "</td>" + "<td>" + item.Name + "</td>" + "<td>" + item.Total + "</td>" + "<td>" + "<a href='#Departments' class='EditDept' attr3='" + item.Id + "'>" + "Edit</a>" + "|" + "<a href='#Departments' class='DeleteDept' attr4='" + item.Id + "'>" + "Delete</a>" + "</td>" + "</tr>");;
                     });
                 },
-                error: function(data) {
+                error: function (data) {
                     console.log(data);
                 }
             });
@@ -304,10 +309,10 @@
                 url: "/Home/GetNumberOfEmpByDeptId",
                 type: "GET",
                 data: { id: id1 },
-                success: function(data) {
+                success: function (data) {
                     count = data;
                 },
-                error: function(data) {
+                error: function (data) {
                     alert("fail");
                 }
             });
@@ -327,13 +332,13 @@
                     type: "POST",
                     data: { name: name },
                     datatype: "json",
-                    success: function(data) {
+                    success: function (data) {
                         id = data;
                         ChkDept(id);
                         $("#dialog2").dialog("close");
                         $("#DeptName").val("");
                     },
-                    error: function(data) {
+                    error: function (data) {
                         alert("fail");
                     }
                 });
@@ -352,14 +357,14 @@
                     type: "POST",
                     data: { id: id, name: name },
                     datatype: "json",
-                    success: function(data) {
+                    success: function (data) {
                         $("#tblDept").empty();
                         $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "No of employees" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
                         displayDeptAll();
                         $("#dialog3").dialog('close');
 
                     },
-                    error: function(data) {
+                    error: function (data) {
                         alert("fail");
                     }
                 });
@@ -375,14 +380,14 @@
                 type: "POST",
                 data: { id: id },
                 datatype: "json",
-                success: function(data) {
+                success: function (data) {
                     $("#tblDept").empty();
                     $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "No of employees" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
                     displayDeptAll();
                     $("#dialogDelConDept").dialog("close");
 
                 },
-                error: function(data) {
+                error: function (data) {
                     alert("fail");
                 }
             });
@@ -390,28 +395,34 @@
     </script>
 
 
-
     <!--general scripts-->
     <script>
-        $(function() {
+        function fillingData() {
+            
+            $("#tblDept").empty();
+            $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "No of employees" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
+            displayDeptAll();
+            $("#OpenDialog1").show();
+            $("#tblDept").show();
+            $("#tblEmp").hide();
+            $("#OpenDialog").hide();
+
+        }
+        $(function () {
+            FetchDataDropDown();
 
             FetchAllEmp();
+            if ($(location).attr('href') == "http://10.1.81.226/#Departments") {
+                fillingData();
 
-            FetchDataDropDown();
-            //on Employee link click event
-            $("#DeptLink").click(function() {
-                $("#tblDept").empty();
-                $("#tblDept").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "No of employees" + "</td>" + "<td>" + "Actions" + "</td>" + "</tr>");
-                displayDeptAll();
-                $("#OpenDialog1").show();
-                $("#tblDept").show();
-                $("#tblEmp").hide();
-                $("#OpenDialog").hide();
-
+            }
+            //on Department link click event
+            $("#DeptLink").click(function () {
+                fillingData();
             });
 
-            //on Department link click event
-            $("#EmpLink").click(function() {
+            //on Employee link click event
+            $("#EmpLink").click(function () {
                 FetchDataDropDown();
                 $("#tblEmp").empty();
                 $("#tblEmp").append("<tr>" + "<td>" + "Id" + "</td>" + "<td>" + "Name" + "</td>" + "<td>" + "Department" + "</td>" + "<td>" + "Action" + "</td>" + "</tr>");
@@ -419,7 +430,6 @@
                 $("#OpenDialog").show();
                 $("#tblDept").hide();
                 $("#OpenDialog1").hide();
-
             });
 
             // create dialog for Employee
@@ -482,11 +492,11 @@
                 width: 600,
                 autoOpen: false,
                 resizable: false,
-                open: function(event, ui) {
+                open: function (event, ui) {
                     $(this).css('overflow', 'hidden');
                     $("body").css('overflow', 'hidden');
                 },
-                beforeClose: function(event, ui) {
+                beforeClose: function (event, ui) {
                     $("body").css({ overflow: 'inherit' });
                 },
                 show: {
@@ -502,11 +512,11 @@
                 width: 600,
                 autoOpen: false,
                 resizable: false,
-                open: function(event, ui) {
+                open: function (event, ui) {
                     $(this).css('overflow', 'hidden');
                     $("body").css('overflow', 'hidden');
                 },
-                beforeClose: function(event, ui) {
+                beforeClose: function (event, ui) {
                     $("body").css({ overflow: 'inherit' });
                 },
                 show: {
@@ -515,27 +525,27 @@
                 },
             });
             // click event for opening create Dialog
-            $("#OpenDialog").click(function() {
+            $("#OpenDialog").click(function () {
 
                 $.ajax({
                     url: "/Home/LoadDropDownList",
                     type: "GET",
 
                     datatype: "json",
-                    success: function(data) {
+                    success: function (data) {
                         $("#dialog").dialog("open");
                         $("#DropDown").empty();
                         var jsonObj = JSON.parse(data);
-                        debugger;
+
                         if (jsonObj != "") {
-                            $.each(jsonObj, function(index, optiondata) {
+                            $.each(jsonObj, function (index, optiondata) {
 
                                 $("#DropDown").append("<option value='" + optiondata.Id + "'>" + optiondata.Name + "</option>");
                             });
                         } else {
                             $("#chkk").empty();
                             $("#chkk").append("<p><b>Please create a new department first to assign it to an employ!</b></p>");
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 $("#dialog").dialog("close");
 
                                 var url = '@Url.Action("Index", "Home")';
@@ -544,7 +554,7 @@
 
                         }
                     },
-                    error: function(data) {
+                    error: function (data) {
                         alert("fail");
                     }
                 });
@@ -552,14 +562,14 @@
             });
 
             // click event for editing dialog
-            $("#OpenDialog1").click(function() {
+            $("#OpenDialog1").click(function () {
 
 
                 $("#dialog2").dialog("open");
             });
 
 
-            $(document).on('click', '.Edit', function() {
+            $(document).on('click', '.Edit', function () {
                 var id = $(this).attr("attr1");
                 $.ajax({
                     url: "/Home/GetEmpById",
@@ -568,14 +578,14 @@
                     contentType: 'application/json; charset=utf-8',
                     data: { id: id },
                     datatype: "json",
-                    success: function(result) {
+                    success: function (result) {
                         var jsonObj = JSON.parse(result);
                         $("#dialog1").dialog('open');
                         $("#Name1").val(jsonObj.Name);
                         $("#DropDown1").val(jsonObj.DepartmentId);
                         $("#EditId").val(id);
                     },
-                    error: function(result) {
+                    error: function (result) {
 
                         alert('fail');
                     }
@@ -583,7 +593,7 @@
             });
 
             //click event for Deleteing employee
-            $(document).on('click', '.Delete', function() {
+            $(document).on('click', '.Delete', function () {
 
                 var id = $(this).attr("attr2");
                 $.ajax({
@@ -593,20 +603,20 @@
                     contentType: 'application/json; charset=utf-8',
                     data: { id: id },
                     datatype: "json",
-                    success: function(result) {
+                    success: function (result) {
                         var jsonObj = JSON.parse(result);
                         $("#dialogDelConEmp").dialog('open');
                         $("#PempName").text(jsonObj.Name + " from department " + jsonObj.Department.Name + " ?");
                         $("#EditDelId").val(id);
                     },
-                    error: function(result) {
+                    error: function (result) {
 
                         alert('fail');
                     }
                 });
             });
             // click event for editing department
-            $(document).on('click', '.EditDept', function() {
+            $(document).on('click', '.EditDept', function () {
                 var id = $(this).attr("attr3");
 
                 $.ajax({
@@ -616,14 +626,14 @@
                     contentType: 'application/json; charset=utf-8',
                     data: { id: id },
                     datatype: "json",
-                    success: function(result) {
+                    success: function (result) {
                         var jsonObj = JSON.parse(result);
                         $("#dialog3").dialog('open');
                         $("#DeptName1").val(jsonObj.Name);
                         $("#EditDeptId").val(id);
 
                     },
-                    error: function(result) {
+                    error: function (result) {
 
                         alert('fail');
                     }
@@ -631,7 +641,7 @@
             });
 
             // click event for deleteing department
-            $(document).on('click', '.DeleteDept', function() {
+            $(document).on('click', '.DeleteDept', function () {
                 var id = $(this).attr("attr4");
                 $.ajax({
                     url: "/Home/GetDeptById",
@@ -640,13 +650,13 @@
                     contentType: 'application/json; charset=utf-8',
                     data: { id: id },
                     datatype: "json",
-                    success: function(result) {
+                    success: function (result) {
                         var jsonObj = JSON.parse(result);
                         $("#dialogDelConDept").dialog('open');
                         $("#PdeptName").text(jsonObj.Name + "?");
                         $("#EditDelDeptId").val(id);
                     },
-                    error: function(result) {
+                    error: function (result) {
 
                         alert('fail');
                     }
